@@ -1,7 +1,5 @@
-import yaml
 import flask
-import urllib
-
+import yaml
 
 app = flask.Flask(__name__)
 
@@ -16,7 +14,7 @@ def index():
 CONFIG = {"API_KEY": "771df488714111d39138eb60df756e6b"}
 
 
-class Person(object):
+class Person:
     def __init__(self, name):
         self.name = name
 
@@ -27,14 +25,16 @@ def print_nametag(format_string, person):
 
 def fetch_website(urllib_version, url):
     # Import the requested version (2 or 3) of urllib
-    exec(f"import urllib{urllib_version} as urllib", globals())
-    # Fetch and print the requested URL
+    if urllib_version == 2:
+        import urllib2 as urllib
+    elif urllib_version == 3:
+        import urllib3 as urllib
 
-    try:
-        http = urllib.PoolManager()
-        http.request("GET", url)
-    except:
-        print("Exception")
+    # Fetch and print the requested URL
+    http = urllib.PoolManager()
+    r = http.request("GET", url)
+
+    print(r.data)
 
 
 def load_yaml(filename):
@@ -47,7 +47,9 @@ def load_yaml(filename):
 
 def authenticate(password):
     # Assert that the password is correct
-    assert password == "Iloveyou", "Invalid password!"
+    if password != "Iloveyou":
+        raise ValueError("Invalid password!")
+
     print("Successfully authenticated!")
 
 
